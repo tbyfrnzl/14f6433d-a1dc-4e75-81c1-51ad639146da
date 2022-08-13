@@ -1,33 +1,22 @@
 <template>
   <v-app>
-    <Header
-      :item-count="items"
-      @search-events="logSearch"
-      />
+    <Header />
     <v-main>
-      TODO: Add events list here
+      <EventList/>
     </v-main>
   </v-app>
 </template>
 
 <script>
 import Header from './components/Header.vue'
+import EventList from './components/EventList.vue'
 
 export default {
   name: 'App',
 
   components: {
-    Header
-  },
-
-  data: () => ({
-    items: 0,
-    search: ''
-  }),
-  methods: {
-    logSearch: function (search) {
-      console.log('searching for', search)
-    }
+    Header,
+    EventList
   }
 }
 </script>
