@@ -12,6 +12,9 @@ export const useEventStore = defineStore('events', {
       const filteredMap = flatMap.filter(e => !e.addedToCart)
 
       // TODO: Filter events by search string
+      if (state.search.length > 0) {
+        console.log('theres a query', state.search)
+      }
 
       const groupedData = this.groupFlatMap(filteredMap)
 
@@ -76,12 +79,12 @@ export const useEventStore = defineStore('events', {
 
       return groupedEvents
     },
-    markAsAdded (event) {
+    markAs (event, addToCart) {
       const flattenedEvents = this.events.flatMap(event => event.events)
 
       const eventToAdd = flattenedEvents.find(e => e.details._id === event._id)
 
-      eventToAdd.addedToCart = true
+      eventToAdd.addedToCart = addToCart
     }
   }
 })
