@@ -7,18 +7,17 @@
       hide-details
       filled
     >
-      <!-- <font-awesome-icon icon="magnifying-glass" size="sm" slot="prepend-inner" /> -->
+      <font-awesome-icon icon="magnifying-glass" size="sm" slot="prepend-inner" />
     </v-text-field>
 
     <v-spacer></v-spacer>
 
-    <!-- https://vuetifyjs.com/en/components/badges/ -->
     <v-dialog v-model="cartOpen" width="800">
       <v-card>
         <v-card-title>Warenkorb ({{items}})</v-card-title>
         <v-card-text>
           <CartItem v-for="item in cartItems" :item="item" :key="item._id"/>
-          <div v-if="cartItems.length === 0">Es befinden sich derzeit keine Events in deinem Warenkorb. Um ein Event hinzuzufügen, wähle ein Event aus der Liste aus und klicke den "+"-Button.</div>
+          <div v-if="cartItems.length === 0">Es befinden sich derzeit keine Events in deinem Warenkorb. <br />Um ein Event hinzuzufügen, wähle ein Event aus der Liste aus und klicke den "+"-Button.</div>
         </v-card-text>
         <v-card-actions>
           <v-spacer></v-spacer>
@@ -70,6 +69,11 @@ export default {
 .v-toolbar {
   &__content {
     padding: 4px 25px;
+
+    .v-text-field--enclosed.v-input--dense:not(.v-text-field--solo).v-text-field--single-line .v-input__prepend-inner {
+      margin-top: 12px;
+      margin-right: 5px;
+    }
 
     .v-badge:hover {
       cursor: pointer;
