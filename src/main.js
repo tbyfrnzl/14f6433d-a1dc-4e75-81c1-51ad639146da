@@ -2,7 +2,7 @@ import Vue from 'vue'
 import App from './App.vue'
 import vuetify from './plugins/vuetify'
 import { library } from '@fortawesome/fontawesome-svg-core'
-import { faCartShopping, faPlus, faLocationDot, faMagnifyingGlass } from '@fortawesome/free-solid-svg-icons'
+import { faCartShopping, faPlus, faLocationDot, faMagnifyingGlass, faCalendarDay } from '@fortawesome/free-solid-svg-icons'
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
 import { createPinia, PiniaVuePlugin } from 'pinia'
 
@@ -11,7 +11,7 @@ const pinia = createPinia()
 
 Vue.config.productionTip = false
 
-library.add(faCartShopping, faPlus, faLocationDot, faMagnifyingGlass)
+library.add(faCartShopping, faPlus, faLocationDot, faMagnifyingGlass, faCalendarDay)
 
 Vue.component('font-awesome-icon', FontAwesomeIcon)
 
