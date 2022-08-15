@@ -1,15 +1,14 @@
 <template>
     <v-container app>
-      {{eventsStore.search}}
-        <h1>Public Events</h1>
-        <div v-for="(day, index) in events" :key="index">
-            <h3>{{getDateString(day.day).toUpperCase()}}</h3>
-            <v-row class="css-grid">
-                <v-col v-for="(event, indexx) in day.events" :key="indexx">
+        <h1 class="mb-5">Public Events</h1>
+        <section v-for="(day) in events" :key="day.day">
+            <h2 class="mb-3 mt-3 event-section__header" >{{getDateString(day.day).toUpperCase()}}</h2>
+            <v-row>
+                <v-col cols="4" v-for="(event) in day.events" :key="event._id">
                   <Event :event="event.details" />
                 </v-col>
             </v-row>
-        </div>
+        </section>
     </v-container>
 </template>
 
@@ -27,7 +26,6 @@ export default {
     ...mapStores(useEventStore),
 
     events () {
-      console.log('got events')
       return this.eventsStore.filtered
     }
   },
@@ -42,12 +40,14 @@ export default {
     }
   }
 }
-
 </script>
 
-<style>
-.css-grid {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
+<style lang="less">
+.event-section__header {
+  position: sticky;
+  position: -webkit-sticky;
+  top: 64px;
+  z-index: 2;
+  background-color: rgba(255, 255, 255, 0.795);
 }
 </style>
