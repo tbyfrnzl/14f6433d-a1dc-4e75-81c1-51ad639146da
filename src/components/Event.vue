@@ -39,28 +39,29 @@ export default {
   },
   methods: {
     getTimeString (time) {
+      if (time === undefined) {
+        return 'N/A'
+      }
+
       const date = new Date(time)
 
       // Pad result of get functions for seconds and minutes with zeros when < 10
       const minutes = String(date.getMinutes()).padStart(2, '0')
       const seconds = String(date.getSeconds()).padStart(2, '0')
 
-      return `${date.getDate()}.${
-        date.getMonth() + 1
-      }.${date.getFullYear()}, ${date.getHours()}:${minutes}:${seconds}`
+      return `${date.getDate()}.${date.getMonth() + 1}.
+        ${date.getFullYear()}, ${date.getHours()}:${minutes}:${seconds}`
     },
     addToCart (event) {
-      this.cartStore.add(event)
-      this.eventsStore.markAs(event, true)
-
-      // Show some snackbar with undo button ?
+      this.cartStore.addEvent(event)
+      this.eventsStore.markAsAdded(event, true)
     }
   },
   computed: {
     ...mapStores(useCartStore, useEventStore),
     // The API returns the same link for all venues no matter the name, therefore build our own link for each venue.
     mapsUrl () {
-      // Link looks like https://www.google.com/maps/dir//Colour+Factory+london
+      // Link returned from API looks like https://www.google.com/maps/dir//Colour+Factory+london
       const searchLocation = this.event.venue.name
         .toString()
         .trim()
