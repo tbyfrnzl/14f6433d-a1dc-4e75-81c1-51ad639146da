@@ -5,13 +5,13 @@ export const useCartStore = defineStore('cart', {
     events: []
   }),
   getters: {
-    items: (state) => state.events.length
+    getEventCount: (state) => state.events.length
   },
   actions: {
-    add (event) {
+    addEvent (event) {
       this.events.push(event)
     },
-    remove (event) {
+    removeEvent (event) {
       const index = this.events.findIndex(e => e._id === event._id)
 
       if (index > -1) {
