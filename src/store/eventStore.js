@@ -1,12 +1,25 @@
 import { defineStore } from 'pinia'
 
+export const GroupOptions = {
+  DATE: 'Date',
+  VENUE: 'Venue'
+}
+
+export const SortOptions = {
+  ASC: 'Ascending',
+  DESC: 'Descending'
+}
+
 export const useEventStore = defineStore('events', {
   state: () => ({
     events: [],
-    search: ''
+    search: '',
+    filterByVenues: [],
+    groupBy: GroupOptions.DATE,
+    sort: SortOptions.ASC
   }),
   getters: {
-    filtered (state) {
+    getFilteredEvents (state) {
       const flatMap = state.events.flatMap(event => event.events)
 
       let filteredMap = flatMap.filter(e => !e.addedToCart)
@@ -17,9 +30,25 @@ export const useEventStore = defineStore('events', {
         filteredMap = filteredTitles
       }
 
-      const groupedData = this.groupFlatMap(filteredMap)
+      if (state.filterByVenues.length > 0) {
+        const filteredVenues = filteredMap.filter(e => state.filterByVenues.indexOf(e.details.venue.name) > -1)
+        filteredMap = filteredVenues
+      }
+
+      const sorted = this.sortEvents(filteredMap, false)
+
+      const groupedData = this.groupEventsBy(sorted, state.groupBy, false)
 
       return groupedData
+    },
+    getVenues (state) {
+      const unsortedEvents = state.events.flatMap(event => event.events)
+
+      const venues = unsortedEvents.map(e => e.details.venue)
+
+      const uniqueVenues = [...new Map(venues.map(v => [v.id, v])).values()]
+
+      return uniqueVenues
     }
   },
   actions: {
@@ -27,60 +56,92 @@ export const useEventStore = defineStore('events', {
       const response = await fetch('https://tlv-events-app.herokuapp.com/events/uk/london')
 
       if (!response.ok) {
-        throw new Error(`An error occured loading events:  ${response.status}`)
+        throw new Error(`An error occured loading events: ${response.status}`)
       }
 
       const data = await response.json()
 
-      // Sort
-      const { compare } = Intl.Collator('de')
-      data.sort((a, b) => compare(a.date, b.date))
-      data.sort((a, b) => compare(a.startTime, b.startTime))
+      const sortedEvents = this.sortEvents(data, true)
 
-      const groupedEvents = this.groupEventsByDate(data)
+      const groupedEvents = this.groupEventsBy(sortedEvents, this.groupBy, true)
 
       this.events = groupedEvents
     },
-    groupFlatMap (events) {
-      const listOfDates = events.map(e => e.details.date)
+    sortEvents (events, initial) {
+      let sortedEvents
+      const { compare } = Intl.Collator('en')
 
-      const uniqueDates = [...new Set(listOfDates)]
+      if (this.groupBy === GroupOptions.DATE) {
+        if (this.sort === SortOptions.ASC) {
+          sortedEvents = events.sort((a, b) => {
+            const dateA = initial ? a.startTime : a.details.startTime
+            const dateB = initial ? b.startTime : b.details.startTime
 
-      const groupedEvents = uniqueDates.map(date => {
-        const eventsOnDay = events.filter(event => event.details.date === date)
+            return compare(dateA, dateB)
+          })
 
-        return {
-          day: date,
-          events: eventsOnDay
+          return sortedEvents
+        } else {
+          sortedEvents = events.sort(function (a, b) {
+            const eventA = initial ? a : a.details
+            const eventB = initial ? b : b.details
+
+            return compare(eventB.date, eventA.date) || compare(eventA.startTime, eventB.startTime)
+          })
+
+          return sortedEvents
+        }
+      } else if (this.groupBy === GroupOptions.VENUE) {
+        sortedEvents = events.sort((a, b) => {
+          const venueA = initial ? a.venue.name : a.details.venue.name
+          const venueB = initial ? b.venue.name : b.details.venue.name
+
+          return compare(venueA, venueB)
+        })
+
+        return this.sort === SortOptions.ASC ? sortedEvents : sortedEvents.reverse()
+      }
+    },
+    groupEventsBy (events, groupOption, initial) {
+      if (events.length === 0) return
+
+      const list = events.map(e => {
+        if (groupOption === GroupOptions.DATE) {
+          return initial ? e.date : e.details.date
+        } else if (groupOption === GroupOptions.VENUE) {
+          return initial ? e.venue.name : e.details.venue.name
         }
       })
 
-      return groupedEvents
-    },
-    groupEventsByDate (events) {
-      const listOfDates = events.map(e => e.date)
+      const uniqueList = [...new Set(list)]
 
-      const uniqueDates = [...new Set(listOfDates)]
+      const groupedEvents = uniqueList.map(item => {
+        let eventsInGroup = events.filter(e => {
+          if (groupOption === GroupOptions.DATE) {
+            return initial ? e.date === item : e.details.date === item
+          } else if (groupOption === GroupOptions.VENUE) {
+            return initial ? e.venue.name === item : e.details.venue.name === item
+          }
+        })
 
-      const groupedEvents = uniqueDates.map(date => {
-        const eventsOnDay = events
-          .filter(event => event.date === date)
-          .map(event => {
+        if (initial) {
+          eventsInGroup = eventsInGroup.map(event => {
             return {
               details: event,
               addedToCart: false
             }
           })
+        }
 
         return {
-          day: date,
-          events: eventsOnDay
+          group: item,
+          events: eventsInGroup
         }
       })
 
       return groupedEvents
     },
-    markAs (event, addToCart) {
+    markAsAdded (event, addToCart) {
       const flattenedEvents = this.events.flatMap(event => event.events)
 
       const eventToAdd = flattenedEvents.find(e => e.details._id === event._id)
