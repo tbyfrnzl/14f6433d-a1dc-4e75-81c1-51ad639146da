@@ -1,15 +1,16 @@
 <template>
     <v-container app>
-        <h1 class="mb-5">Public Events</h1>
-        <section v-for="(day) in events" :key="day.day">
-            <h2 class="mb-3 mt-3 event-list__section-header" >{{getDateString(day.day).toUpperCase()}}</h2>
+        <h1 class="mb-5">Events in London ({{ eventCount }})</h1>
+        <Filters />
+        <section v-for="group in events" :key="group.group">
+            <h2 class="mb-3 mt-3 event-list__section-header" >{{ getHeading(group.group) }}</h2>
             <v-row>
-                <v-col cols="4" v-for="(event) in day.events" :key="event._id">
+                <v-col cols="4" v-for="(event) in group.events" :key="event._id">
                   <Event :event="event.details" />
                 </v-col>
             </v-row>
         </section>
-        <div v-if="events.length === 0" class="event-list__loading-indicator">
+        <div v-if="eventCount === 0" class="event-list__loading-indicator">
           <font-awesome-icon icon="spinner" class="fa-spin" />
           Loading events
         </div>
@@ -19,28 +20,38 @@
 <script>
 import Event from './Event.vue'
 import { mapStores } from 'pinia'
-import { useEventStore } from '../store/eventStore'
+import { GroupOptions, useEventStore } from '../store/eventStore'
+import Filters from './Filters.vue'
 
 export default {
   name: 'EventList',
   components: {
-    Event
+    Event,
+    Filters
   },
   computed: {
     ...mapStores(useEventStore),
 
     events () {
-      return this.eventsStore.filtered
+      return this.eventsStore.getFilteredEvents
+    },
+    eventCount () {
+      if (this.events === undefined) return 0
+      return this.events.flatMap(e => e.events).length
     }
   },
   mounted () {
     this.eventsStore.fetchEvents()
   },
   methods: {
-    getDateString (day) {
-      const date = new Date(day)
+    getHeading (item) {
+      if (this.eventsStore.groupBy === GroupOptions.DATE) {
+        const date = new Date(item)
 
-      return date.toDateString()
+        return date.toDateString().toUpperCase()
+      } else {
+        return item.toUpperCase()
+      }
     }
   }
 }
@@ -54,11 +65,11 @@ export default {
   }
 
   &__section-header {
-  position: sticky;
-  position: -webkit-sticky;
-  top: 64px;
-  z-index: 2;
-  background-color: rgba(255, 255, 255, 0.8);
-}
+    position: sticky;
+    position: -webkit-sticky;
+    top: 64px;
+    z-index: 2;
+    background-color: rgba(255, 255, 255, 0.8);
+  }
 }
 </style>
