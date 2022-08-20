@@ -13,7 +13,7 @@
       </p>
       <div>
         <v-btn @click="removeFromCart(item)" plain block>
-          Event entfernen
+          Remove event
         </v-btn>
       </div>
     </div>
@@ -33,8 +33,8 @@ export default {
   },
   methods: {
     removeFromCart (event) {
-      this.cartStore.remove(event)
-      this.eventsStore.markAs(event, false)
+      this.cartStore.removeEvent(event)
+      this.eventsStore.markAsAdded(event, false)
     },
     getDate (dateOfEvent) {
       const date = new Date(dateOfEvent)

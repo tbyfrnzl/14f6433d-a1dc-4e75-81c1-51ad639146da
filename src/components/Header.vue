@@ -2,10 +2,11 @@
   <v-app-bar app color="teal darken-4" dark elevation="2">
     <v-text-field
       v-model="eventsStore.search"
-      placeholder="Events durchsuchen"
+      placeholder="Search events..."
       dense
       hide-details
       filled
+      class="shrink"
     >
       <font-awesome-icon icon="magnifying-glass" size="sm" slot="prepend-inner" />
     </v-text-field>
@@ -14,16 +15,16 @@
 
     <v-dialog v-model="cartOpen" width="800">
       <v-card>
-        <v-card-title>Warenkorb ({{items}})</v-card-title>
+        <v-card-title>Cart ({{items}})</v-card-title>
         <v-card-text>
           <CartItem v-for="item in cartItems" :item="item" :key="item._id"/>
-          <div v-if="cartItems.length === 0">Es befinden sich derzeit keine Events in deinem Warenkorb. <br />Um ein Event hinzuzufügen, wähle ein Event aus der Liste aus und klicke den "+"-Button.</div>
+          <div v-if="cartItems.length === 0">There are currently no events in your cart. <br />To add an event to your cart, select one from the list and click the "+" button.</div>
         </v-card-text>
         <v-card-actions>
           <v-spacer></v-spacer>
           <v-btn color="teal darken-3" text
             @click="cartOpen=false">
-            Schließen
+            Close cart
           </v-btn>
         </v-card-actions>
       </v-card>
@@ -50,7 +51,7 @@ export default {
   computed: {
     ...mapStores(useCartStore, useEventStore),
     items: function () {
-      return this.cartStore.items
+      return this.cartStore.getEventCount
     },
     cartItems () {
       return this.cartStore.events
@@ -58,7 +59,6 @@ export default {
   },
   data () {
     return {
-      search: '',
       cartOpen: false
     }
   }
