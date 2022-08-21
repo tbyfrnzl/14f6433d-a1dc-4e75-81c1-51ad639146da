@@ -17,7 +17,7 @@
       <v-col sm="2" class="text-center">
         <v-menu offset-y>
           <template v-slot:activator="{ on, attrs }">
-            <v-btn text v-bind="attrs" v-on="on" color="teal">
+            <v-btn text v-bind="attrs" v-on="on" color="teal darken-3">
               Group by
             </v-btn>
           </template>
@@ -35,7 +35,7 @@
       <v-col sm="2" class="text-center">
         <v-menu offset-y>
           <template v-slot:activator="{ on, attrs }">
-            <v-btn text v-bind="attrs" v-on="on" color="teal">
+            <v-btn text v-bind="attrs" v-on="on" color="teal darken-3">
               Sort
             </v-btn>
           </template>

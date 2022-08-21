@@ -74,9 +74,8 @@ export default {
 
 <style lang="less">
 .event-card {
-
   &__title {
-    height: 100px;
+    height: 120px;
   }
 
   &__content {
