@@ -1,7 +1,7 @@
 <template>
   <v-card class="event-card">
     <v-card-title class="event-card__title">{{ event.title }}</v-card-title>
-    <v-img :src="event.flyerFront" height="400" v-on:error="event.flyerFront ='https://st3.depositphotos.com/23594922/31822/v/600/depositphotos_318221368-stock-illustration-missing-picture-page-for-website.jpg'"/>
+    <v-img :src="getRandomEventImage()" height="400" v-on:error="event.flyerFront ='https://st3.depositphotos.com/23594922/31822/v/600/depositphotos_318221368-stock-illustration-missing-picture-page-for-website.jpg'"/>
     <v-card-text class="event-card__content">
       <p class="text-body-1 font-weight-bold event-card__location">
         <font-awesome-icon icon="location-dot" color="teal" class="event-card__location-icon" />
@@ -38,6 +38,33 @@ export default {
     }
   },
   methods: {
+    getEventImage () {
+      if (this.event.flyerFront !== null) return this.event.flyerFront
+      else {
+        if (this.event.images.length > 0) {
+          return this.event.images[0].filename
+        } else {
+          return 'https://st3.depositphotos.com/23594922/31822/v/600/depositphotos_318221368-stock-illustration-missing-picture-page-for-website.jpg'
+        }
+      }
+    },
+    getRandomEventImage () {
+      const images = []
+
+      if (!!this.event.flyerFront) images.push(this.event.flyerFront)
+
+      if (this.event.images.length > 0) {
+        this.event.images.forEach(i => images.push(i.filename))
+      }
+
+      if (images.length === 0) {
+        return 'https://st3.depositphotos.com/23594922/31822/v/600/depositphotos_318221368-stock-illustration-missing-picture-page-for-website.jpg'
+      } else {
+        const random = Math.floor(Math.random() * (images.length - 1))
+
+        return images[random]
+      }
+    },
     getTimeString (time) {
       if (time === undefined) {
         return 'N/A'
@@ -66,7 +93,7 @@ export default {
         .trim()
         .replace(/\s/g, '+')
 
-      return `https://www.google.com/maps/dir//${searchLocation}+london`
+      return `https://www.google.com/maps/dir//${searchLocation}+${this.event.city}`
     }
   }
 }

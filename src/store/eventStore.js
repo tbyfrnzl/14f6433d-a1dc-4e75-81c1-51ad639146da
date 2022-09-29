@@ -53,7 +53,7 @@ export const useEventStore = defineStore('events', {
   },
   actions: {
     async fetchEvents () {
-      const response = await fetch('https://tlv-events-app.herokuapp.com/events/uk/london')
+      const response = await fetch('https://tlv-events-app.herokuapp.com/events/de/berlin')
 
       if (!response.ok) {
         throw new Error(`An error occured loading events: ${response.status}`)
